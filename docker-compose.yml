@@ -1,0 +1,22 @@
+version: "2"
+services:
+
+  php:
+    build: docker/php
+    working_dir: /var/www/faking
+    volumes:
+      - .:/var/www/faking
+      - /dev/shm:/dev/shm
+    tty: true
+    stdin_open: true
+    privileged: true
+
+  firefox:
+    # -enablePassThrough が使えるのは3.8.1まで
+    image: selenium/standalone-firefox-debug:3.8.1  # vnc付き日本語フォントあり
+    ports:
+      - "15905:5900"  # localhost:15905でローカルからvncアクセスできるように
+    environment:
+      - SE_OPTS=-enablePassThrough false  # これやらないとfacebook/WebDriverが動かない
+    volumes:
+      - /dev/shm:/dev/shm
