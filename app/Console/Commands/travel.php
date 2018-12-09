@@ -99,6 +99,28 @@ class travel extends Command
         $this->info('save screenshot');
         $driver->takeScreenshot(storage_path('yakiniku-hakata.png'));
 
+        // 「正確な現在地を使用」をクリック
+        $this->info('click swml-upd');
+        $driver->findElement(WebDriverBy::id('swml-upd'))->click();
+
+        // 現在地更新されるまで待つ
+        $driver->wait(10, 500)->until(
+            WebDriverExpectedCondition::presenceOfElementLocated(WebDriverBy::cssSelector('#loc.known_loc'))
+        );
+
+        // reload
+        $this->info('reload');
+        $driver->navigate()->refresh();
+
+        $driver->wait(10, 500)->until(
+            // ページ遷移したかどうかは #swml-upd = 「正確な現在地を使用」リンクがあるかどうかで判定
+            WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::id('swml-upd'))
+        );
+
+        // スクリーンショットを保存
+        $this->info('save screenshot');
+        $driver->takeScreenshot(storage_path('yakiniku-hakata-retry.png'));
+
         // ブラウザを閉じる
         $this->info('close browser');
         $driver->close();
